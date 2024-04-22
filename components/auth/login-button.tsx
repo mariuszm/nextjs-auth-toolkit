@@ -24,7 +24,7 @@ export const LoginButton = ({
   }
 
   return (
-    <span onClick={onClick} className="cursor-pointer">
+    <span className="cursor-pointer" onClick={onClick}>
       {children}
     </span>
   );
