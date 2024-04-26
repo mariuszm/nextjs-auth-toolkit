@@ -10,6 +10,9 @@ import { LoginSchema } from '@/schemas';
  * Covering a case when users bypass our server action (login.ts) and not use the login screen at all.
  * They can manually send information to the app/api/auth if they want,
  * thus we have to do the LoginSchema check here in the providers.
+ *
+ * NOTE: we can use Prisma (eg. getUserByEmail) inside of Providers because
+ * it doesn't run on the Edge, but simply run once the user tries to sign in.
  */
 
 export default {
