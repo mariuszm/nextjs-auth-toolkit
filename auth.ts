@@ -8,6 +8,23 @@ import { getUserById } from './data/user';
 
 // destruct data to be used server components/actions
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  pages: {
+    signIn: '/auth/login', // next-auth is always gonna redirect to this route, when something goes wrong
+    error: '/auth/error', // if something else goes wrong (regardless login) redirect to this custom error page
+  },
+  events: {
+    /**
+     * whenever a user creates an account using google/github,
+     * we're gonna automatically populate the field emailVerified
+     * (there's no need to verify an email coming from an OAuth provider)
+     */
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
+  },
   callbacks: {
     async session({ token, session }) {
       if (token.sub && session.user) {
