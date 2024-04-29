@@ -14,11 +14,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   events: {
     /**
-     * whenever a user creates an account using google/github,
-     * we're gonna automatically populate the field emailVerified
-     * (there's no need to verify an email coming from an OAuth provider)
+     * Events don't return a response, used for logs/reporting or handling other side effects
      */
     async linkAccount({ user }) {
+      /**
+       * whenever a user creates an account using google/github,
+       * we're gonna automatically populate the field emailVerified
+       * (there's no need to verify an email coming from an OAuth provider)
+       */
       await db.user.update({
         where: { id: user.id },
         data: { emailVerified: new Date() },
@@ -43,13 +46,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
        * Example: if any of those methods is used for log in, NextAuth is never gonna allow to login
        * if we write that inside of signIn() callback
        */
+
       // allow OAuth without email verification
+      // TODO: tests - allow everything to login except when using credentials
       if (account?.provider !== 'credentials') return true;
 
       if (!user.id) return false;
 
       const existingUser = await getUserById(user.id);
 
+      // TODO: tests - check API login credential users that are not verified (not allowed)
+      // prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
       // TODO: add 2FA check
@@ -57,6 +64,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return true;
     },
     async session({ token, session }) {
+      // TODO: tests - check if session is successfully extended with token data
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }

@@ -9,6 +9,7 @@ import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
 
 export const Social = () => {
   const onClick = (provider: 'google' | 'github') => () => {
+    // signIn() imported like this is the way to be used in client components only
     signIn(provider, {
       callbackUrl: DEFAULT_LOGIN_REDIRECT,
     });

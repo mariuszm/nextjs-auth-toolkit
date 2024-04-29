@@ -20,6 +20,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   const existingUser = await getUserByEmail(email);
 
+  // TODO: tests - disable register for existing users
   if (existingUser) {
     return { error: 'Email already in use!' };
   }
