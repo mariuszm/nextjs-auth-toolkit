@@ -59,7 +59,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       // prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      // TODO: add 2FA check
+      // TODO: add 2FA check for credential users
 
       return true;
     },
