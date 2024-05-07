@@ -13,8 +13,7 @@ import { db } from '@/lib/db';
 
 export const generateTwoFactorToken = async (email: string) => {
   const token = crypto.randomInt(100_000, 1_000_000).toString();
-  // TODO: later change to 15 minutes (for production purposes)
-  const expires = new Date(Date.now() + 3600 * 1000);
+  const expires = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
   const existingToken = await getTwoFactorTokenByEmail(email);
 
