@@ -2,9 +2,9 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import NextAuth from 'next-auth';
 
 import authConfig from '@/auth.config';
+import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation';
+import { getUserById } from '@/data/user';
 import { db } from '@/lib/db';
-
-import { getUserById } from './data/user';
 
 // destruct data to be used server components/actions
 export const { auth, handlers, signIn, signOut } = NextAuth({
@@ -59,7 +59,28 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       // prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      // TODO: add 2FA check for credential users
+      // TODO: tests - 2FA check for credential users
+      if (existingUser.isTwoFactorEnabled) {
+        // pay attention not tu use 2FAToken, we need 2FAConfirmation here
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id,
+        );
+
+        if (!twoFactorConfirmation) return false;
+
+        /**
+         * Delete 2FA confirmation for next sign in.
+         * It's safer for 2FA to be very strict BUT:
+         *
+         * you can do otherwise - instead of deleting confirmation
+         * on every login, just add "expires" (eg. 2 days) field to your
+         * TwoFactorConfirmation model in Prisma.
+         * And then make it work the same way like for other tokens we use.
+         */
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        });
+      }
 
       return true;
     },
