@@ -1,21 +1,61 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
+import { z } from 'zod';
 
 import { settings } from '@/actions/settings';
+import { FormError } from '@/components/form-error';
+import { FormSuccess } from '@/components/form-success';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useCurrentUser } from '@/hooks/use-current-user';
+import { SettingsSchema } from '@/schemas';
 
 const SettingsPage = () => {
+  const user = useCurrentUser();
+
+  const [error, setError] = useState<string | undefined>();
+  const [success, setSuccess] = useState<string | undefined>();
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
 
-  const onClick = () => {
+  const form = useForm<z.infer<typeof SettingsSchema>>({
+    resolver: zodResolver(SettingsSchema),
+    defaultValues: {
+      name: user?.name || undefined,
+    },
+    /**
+     * Don't put an empty string but "|| undefined",
+     * because then that will update the Prisma
+     * inside of /actions/settings.ts (because of spreading values)
+     */
+  });
+
+  const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
     startTransition(() => {
-      settings({
-        name: 'test', // TODO: temp
-      }).then(update); // <- if you want to update via useSession()
+      settings(values)
+        .then(data => {
+          if (data?.error) {
+            setError(data.error);
+          }
+
+          if (data?.success) {
+            update(); // <- if you want to update via useSession()
+            setSuccess(data.success);
+          }
+        })
+        .catch(() => setError('Something went wrong!'));
     });
   };
 
@@ -25,9 +65,33 @@ const SettingsPage = () => {
         <p className="text-center text-2xl font-semibold">⚙️ Settings</p>
       </CardHeader>
       <CardContent>
-        <Button onClick={onClick} disabled={isPending}>
-          Update name
-        </Button>
+        <Form {...form}>
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="John Doe"
+                        disabled={isPending}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormError message={error} />
+            <FormSuccess message={success} />
+            <Button type="submit" disabled={isPending}>
+              Save
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

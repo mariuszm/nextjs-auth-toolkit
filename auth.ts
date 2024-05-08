@@ -2,6 +2,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import NextAuth from 'next-auth';
 
 import authConfig from '@/auth.config';
+import { getAccountByUserId } from '@/data/account';
 import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation';
 import { getUserById } from '@/data/user';
 import { db } from '@/lib/db';
@@ -102,6 +103,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.name = token.name;
         session.user.email = token.email || '';
+        session.user.isOAuth = token.isOAuth;
       }
 
       return session;
@@ -120,6 +122,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       if (!exisitingUser) return token;
 
+      const existingAccount = await getAccountByUserId(exisitingUser.id);
+
+      token.isOAuth = Boolean(existingAccount);
       token.name = exisitingUser.name;
       token.email = exisitingUser.email;
       token.role = exisitingUser.role;
