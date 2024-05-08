@@ -23,6 +23,21 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     return { error: 'Unauthorized' };
   }
 
+  /**
+   * Check if the user who wants to update the settings,
+   * is logged in using credentials or oauth
+   *
+   * NOTE: if the field is disabled in the api or the server action,
+   * it should be also hidden on the client side
+   */
+  if (user.isOAuth) {
+    // these are the fields that oauth users cannot modify
+    values.email = undefined; // handled by the provider
+    values.password = undefined; // they don't have a password
+    values.newPassword = undefined;
+    values.isTwoFactorEnabled = undefined; // handled by the provider
+  }
+
   await db.user.update({
     where: { id: dbUser.id },
     data: {
