@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { UserRole } from '@prisma/client';
 import { useSession } from 'next-auth/react';
 import { z } from 'zod';
 
@@ -20,6 +21,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { SettingsSchema } from '@/schemas';
 
@@ -38,6 +46,7 @@ const SettingsPage = () => {
       email: user?.email || undefined,
       password: undefined,
       newPassword: undefined,
+      role: user?.role || undefined,
     },
     /**
      * Don't put an empty string but "|| undefined",
@@ -139,6 +148,31 @@ const SettingsPage = () => {
                         disabled={isPending}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select
+                      disabled={isPending}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
+                        <SelectItem value={UserRole.USER}>User</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
