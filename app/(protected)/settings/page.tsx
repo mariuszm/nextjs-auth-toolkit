@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { SettingsSchema } from '@/schemas';
 
@@ -174,6 +176,27 @@ const SettingsPage = () => {
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isTwoFactorEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Two Factor Authentication</FormLabel>
+                      <FormDescription>
+                        Enable Two Factor Authentication for your account
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        disabled={isPending}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />
