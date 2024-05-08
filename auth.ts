@@ -98,6 +98,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.isTwoFactorEnabled = Boolean(token.isTwoFactorEnabled);
       }
 
+      // manually update the session everytime you change the specific field
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email || '';
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -114,6 +120,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       if (!exisitingUser) return token;
 
+      token.name = exisitingUser.name;
+      token.email = exisitingUser.email;
       token.role = exisitingUser.role;
       token.isTwoFactorEnabled = exisitingUser.isTwoFactorEnabled;
 
