@@ -4,6 +4,7 @@ import type { DefaultSession } from 'next-auth';
 import type { DefaultJWT } from 'next-auth/jwt';
 
 export type ExtendedUser = DefaultSession['user'] & {
+  email: Extract<DefaultSession['user']['email'], string>;
   role: UserRole;
   isTwoFactorEnabled: boolean;
   isOAuth: boolean;

@@ -7,6 +7,8 @@ import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation
 import { getUserById } from '@/data/user';
 import { db } from '@/lib/db';
 
+import { ExtendedUser } from './next-auth';
+
 // destruct data to be used server components/actions
 export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
   pages: {
@@ -108,7 +110,7 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
 
       return session;
     },
-    async jwt({ token }) {
+    async jwt({ token, user, account }) {
       /**
        * Extending the session:
        * We have to pass new data to the token first, because we can get access
@@ -118,17 +120,31 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
        */
       if (!token.sub) return token; // no sub = logged out
 
-      const exisitingUser = await getUserById(token.sub);
+      if (user && account) {
+        // calling the jwt for the first time (on user login)
+        // (this is the ONLY time the user & account objects are populated)
+        const existingUser = user as ExtendedUser;
 
-      if (!exisitingUser) return token;
+        token.isOAuth = account.type === 'oauth';
+        token.name = existingUser.name;
+        token.email = existingUser.email;
+        token.role = existingUser.role;
+        token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+      } else {
+        // calling the jwt elsewhere (after the login - eg. settings page)
+        const exisitingUser = await getUserById(token.sub);
 
-      const existingAccount = await getAccountByUserId(exisitingUser.id);
+        if (!exisitingUser) return token;
 
-      token.isOAuth = Boolean(existingAccount);
-      token.name = exisitingUser.name;
-      token.email = exisitingUser.email;
-      token.role = exisitingUser.role;
-      token.isTwoFactorEnabled = exisitingUser.isTwoFactorEnabled;
+        const existingAccount = await getAccountByUserId(exisitingUser.id);
+        console.log(existingAccount);
+
+        token.isOAuth = Boolean(existingAccount);
+        token.name = exisitingUser.name;
+        token.email = exisitingUser.email;
+        token.role = exisitingUser.role;
+        token.isTwoFactorEnabled = exisitingUser.isTwoFactorEnabled;
+      }
 
       return token;
     },
