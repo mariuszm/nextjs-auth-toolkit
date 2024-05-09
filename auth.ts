@@ -96,13 +96,13 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
       }
 
       if (session.user) {
-        session.user.isTwoFactorEnabled = Boolean(token.isTwoFactorEnabled);
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
       }
 
       // manually update the session everytime you change the specific field
       if (session.user) {
         session.user.name = token.name;
-        session.user.email = token.email || '';
+        session.user.email = token.email;
         session.user.isOAuth = token.isOAuth;
       }
 

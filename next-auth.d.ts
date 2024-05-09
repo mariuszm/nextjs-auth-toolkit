@@ -1,7 +1,7 @@
 // https://authjs.dev/getting-started/typescript#module-augmentation
 import type { UserRole } from '@prisma/client';
 import type { DefaultSession } from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
+import type { DefaultJWT } from 'next-auth/jwt';
 
 export type ExtendedUser = DefaultSession['user'] & {
   role: UserRole;
@@ -17,6 +17,7 @@ declare module 'next-auth' {
 
 declare module 'next-auth/jwt' {
   interface JWT {
+    email: Extract<DefaultJWT['email'], string>;
     role?: UserRole;
     isTwoFactorEnabled: boolean;
     isOAuth: boolean;
