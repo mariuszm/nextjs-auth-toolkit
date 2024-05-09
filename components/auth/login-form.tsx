@@ -52,8 +52,11 @@ export const LoginForm = () => {
       login(values, callbackUrl)
         .then(data => {
           if (data?.error) {
-            form.reset();
             setError(data.error);
+
+            if (data?.error === 'Invalid code!') return;
+
+            form.reset();
           }
 
           if (data?.success) {
