@@ -137,7 +137,6 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
         if (!exisitingUser) return token;
 
         const existingAccount = await getAccountByUserId(exisitingUser.id);
-        console.log(existingAccount);
 
         token.isOAuth = Boolean(existingAccount);
         token.name = exisitingUser.name;
