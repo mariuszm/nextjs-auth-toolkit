@@ -47,7 +47,19 @@ export default auth(req => {
 
   // don't allow access to protected routes unless logged in
   if (!isLoggedIn && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/auth/login', nextUrl));
+    /**
+     * Store the last place the user has visited on log out,
+     * and after logging back redirect to that path again
+     */
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
+    }
+
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+    return NextResponse.redirect(
+      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl),
+    );
   }
 
   return undefined;
