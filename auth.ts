@@ -8,7 +8,7 @@ import { getUserById } from '@/data/user';
 import { db } from '@/lib/db';
 
 // destruct data to be used server components/actions
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
   pages: {
     signIn: '/auth/login', // next-auth is always gonna redirect to this route, when something goes wrong
     error: '/auth/error', // if something else goes wrong (regardless login) redirect to this custom error page
