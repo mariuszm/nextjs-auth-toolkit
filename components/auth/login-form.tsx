@@ -54,9 +54,9 @@ export const LoginForm = () => {
           if (data?.error) {
             setError(data.error);
 
-            if (data?.error === 'Invalid code!') return;
-
-            form.reset();
+            if (values?.code) {
+              values.code = '';
+            }
           }
 
           if (data?.success) {
