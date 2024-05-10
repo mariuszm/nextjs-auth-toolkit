@@ -1,5 +1,6 @@
 'use server';
 
+import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 
@@ -34,6 +35,13 @@ export const login = async (
   if (!existingUser || !existingUser.email || !existingUser.password) {
     // existingUser.password === false -> oauth login
     return { error: 'Email does not exist!' };
+  }
+
+  // don't allow verification if credentials are invalid
+  const passwordsMatch = await bcrypt.compare(password, existingUser.password);
+
+  if (!passwordsMatch) {
+    return { error: 'Incorrect password!' };
   }
 
   // don't allow login if the user still haven't verified his email

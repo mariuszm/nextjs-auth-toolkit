@@ -41,7 +41,7 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
      * an equivalent in your callbacks (for the sake of total security & user experience).
      * Remember to always have equivalent things inside of NextAuth.
      * Whatever you write in your server actions / api route match that inside of callbacks
-     & as much as you can (as a fallback) to highly improve the security of the application.
+     * as much as you can (as a fallback) to highly improve the security of the application.
      */
     async signIn({ user, account }) {
       /**
