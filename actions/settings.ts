@@ -93,7 +93,10 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
    */
   unstable_update({
     user: {
-      ...updatedUser,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      isTwoFactorEnabled: updatedUser.isTwoFactorEnabled,
     },
   });
 
