@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 
+import { getAccountByUserId } from '@/data/account';
 import { getUserByEmail } from '@/data/user';
 import { sendPasswordResetEmail } from '@/lib/mail';
 import { generatePasswordResetToken } from '@/lib/tokens';
@@ -20,6 +21,12 @@ export const reset = async (values: z.infer<typeof ResetSchema>) => {
 
   if (!existingUser) {
     return { error: 'Email not found!' };
+  }
+
+  const isOAuth = await getAccountByUserId(existingUser.id);
+
+  if (isOAuth) {
+    return { error: 'Provider account! Change not allowed!' };
   }
 
   try {
