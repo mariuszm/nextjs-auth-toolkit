@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Auth Toolkit
 
-## Getting Started
+## Getting started
 
-First, run the development server:
+Please make sure you have installed the latest version of Node.js.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Install dependencies with:
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Launch devserver (at http://localhost:3000):
+```
+npm run dev
+```
+## Database
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+NOTE: There are types added for Prisma in globalThis for dev environment. Why? For Next.js hot reload so there is no need to initialize `new PrismaClient()` on every file save (global is not affected by hot reload). Please check the:
+```
+/lib/db.ts
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Create `/prisma/schema.prisma` and fill `.env` with fake database url:
+```
+npx prisma init
+```
 
-## Learn More
+After obtaining an actual database url update `/prisma/prisma.schema` and `.env` files with proper values.
 
-To learn more about Next.js, take a look at the following resources:
+Run this command to generate your model from Prisma schema so you can access it from `db` object in `/lib/d.ts`:
+```
+npx prisma generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Push your collection to database (synchronize your Prisma schema):
+```
+npx prisma db push
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+To clear your database:
+```
+npx prisma migrate reset
+npx prisma db push
+```
 
-## Deploy on Vercel
+Preview your database with:
+```
+npx prisma studio
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Known Issues
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Since the app is using NextAuth v5 (beta) it still introduces some unstable behaviors which make it not usable in production.
+
+- there's a problem updating user session values via the Settings Page. While the client-side page shows the latest users session values properly, the server-side page fails to keep up in most cases.
+- for the server-side update NextAuth has renamed `update` to `unstable_update` in beta5, it may introduce the opposite behavior when the server-side page is being updated, and the client-side doesn't change at all (for both cases manual page refresh is necessary).
+- `useSession` returns `null` on first render
+
+## TODO
+
+- update docs for third-party vendors (OAuth providers, Resend, Vercel)
+- fix updating user session values (server-side page)
+- add tests
+- add GitHub Actions
+- add Husky
+- add parallel routes
+- add RWD
+- add SEO metadata
+- clean up JSX with reusable components
+- migrate to the new ESLint flat config
