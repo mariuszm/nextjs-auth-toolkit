@@ -91,7 +91,7 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
    * TODO: improve the code when stable version is released.
    * BTW this is not necessary. Just wanted to try out the server-side way
    */
-  unstable_update({
+  await unstable_update({
     user: {
       name: updatedUser.name,
       email: updatedUser.email,
