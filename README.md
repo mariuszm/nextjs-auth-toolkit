@@ -61,13 +61,12 @@ npx prisma studio
 
 Since the app is using NextAuth v5 (beta) it still introduces some unstable behaviors which make it not usable in production.
 
-- there's a problem updating user session values via the Settings Page. While the client-side page shows the latest users session values properly, the server-side page fails to keep up in most cases.
-- for the server-side update NextAuth has renamed `update` to `unstable_update` in beta5, it may introduce the opposite behavior when the server-side page is being updated, and the client-side doesn't change at all (for both cases manual page refresh is necessary).
 - `useSession` returns `null` on first render
 
 ## TODO
 
 - update docs for third-party vendors (OAuth providers, Resend, Vercel)
+- fix reading session with `useSession` (client-side) on first render
 - fix updating user session values (server-side page)
 - add tests
 - add GitHub Actions
