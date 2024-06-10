@@ -57,12 +57,6 @@ Preview your database with:
 npx prisma studio
 ```
 
-## Known Issues
-
-Since the app is using NextAuth v5 (beta) it still introduces some unstable behaviors which make it not usable in production.
-
-- `useSession` returns `null` on first render
-
 ## TODO
 
 - update docs for third-party vendors (OAuth providers, Resend, Vercel)
